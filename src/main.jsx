@@ -152,7 +152,7 @@ function App() {
   }
   async function switchRole(persona) {
     setBusy(true); setError('');
-    try { await api('/auth/logout', { method: 'POST' }); const result = await api('/auth/login', { method: 'POST', body: { email: persona.email, password: persona.password } }); setUser(result.user); setSelectedId(null); setSelected(null); await load(result.user, null); setNotice(`Switched to ${persona.title}`); }
+    try { await api('/auth/logout', { method: 'POST' }).catch(() => {}); const result = await api('/auth/login', { method: 'POST', body: { email: persona.email, password: persona.password } }); setUser(result.user); setSelectedId(null); setSelected(null); await load(result.user, null); setNotice(`Switched to ${persona.title}`); }
     catch (cause) { setError(cause.message); }
     finally { setBusy(false); }
   }

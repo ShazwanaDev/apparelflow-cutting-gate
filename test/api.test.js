@@ -57,6 +57,7 @@ test('a verifier approves complete counts and the batch enters the sewing queue'
   assert.equal(approved.body.order.status, 'VERIFIED');
   assert.equal(approved.body.order.logs[0].verifier_name, 'Nilan Fernando');
   assert.equal(approved.body.order.logs[0].wastage_pct, 2.22);
+  assert.ok(approved.body.order.logs[0].items.every(item => item.variance_qty === 0));
   const queue = await f.call('/api/sewing/queue', { cookie: sewing });
   assert.deepEqual(queue.body.orders.map(item => item.id), [batch.id]);
   assert.throws(() => f.db.prepare("DELETE FROM verification_logs WHERE order_id = ?").run(batch.id), /immutable/);

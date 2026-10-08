@@ -60,7 +60,7 @@ The login page and sidebar provide a role switcher. Each switch signs into the c
 
 SQLite is stored at `./data/apparelflow.sqlite` by default. The `data/` directory is ignored by Git. Set `DATABASE_PATH` to an **absolute path on a persistent volume** when deploying; an ephemeral cloud filesystem would lose orders after a restart. `PORT` changes the HTTP port. `COOKIE_SECURE=true` forces HTTPS-only cookies; production mode also enables secure cookies automatically. See `.env.example`.
 
-The relational schema includes `users`, `recipes`, `recipe_components`, `cutting_orders`, `verification_items`, `verification_logs`, and `sessions`. Foreign keys enforce relationships. Verification logs store a snapshot of component counts, verifier ID, decision, timestamp, and (on approval) fabric wastage percentage. Database triggers forbid updates or deletes to these logs.
+The relational schema includes `users`, `recipes`, `recipe_components`, `cutting_orders`, `verification_items`, `verification_logs`, and `sessions`. Foreign keys enforce relationships. Verification logs store a snapshot of component counts and variances, verifier ID, decision, timestamp, and (on approval) fabric wastage percentage. Database triggers forbid updates or deletes to these logs.
 
 ## API boundaries
 

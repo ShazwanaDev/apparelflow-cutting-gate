@@ -194,8 +194,9 @@ export function createApp(db) {
         fail(422, 'Every component must be counted with no shortage');
       }
       const wastage = wastagePercent(order.actual_fabric_yds, order.std_fabric_yards, order.target_qty);
+      const snapshot = order.items.map(item => ({ ...item, variance_qty: item.actual_qty - item.expected_qty }));
       db.prepare(`INSERT INTO verification_logs (order_id,verifier_id,decision,wastage_pct,items_json)
-        VALUES (?,?,?,?,?)`).run(id, req.user.id, 'APPROVED', wastage, JSON.stringify(order.items));
+        VALUES (?,?,?,?,?)`).run(id, req.user.id, 'APPROVED', wastage, JSON.stringify(snapshot));
       db.prepare(`UPDATE cutting_orders SET status = ?, verified_at = CURRENT_TIMESTAMP,
         updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(ORDER_STATUS.VERIFIED, id);
     });
@@ -209,8 +210,9 @@ export function createApp(db) {
     transaction(db, () => {
       const order = orderDetails(db, id);
       if (order.status !== ORDER_STATUS.PENDING) fail(409, 'Only pending orders can be rejected');
+      const snapshot = order.items.map(item => ({ ...item, variance_qty: item.actual_qty === null ? null : item.actual_qty - item.expected_qty }));
       db.prepare(`INSERT INTO verification_logs (order_id,verifier_id,decision,rejection_note,items_json)
-        VALUES (?,?,?,?,?)`).run(id, req.user.id, 'REJECTED', reason.trim(), JSON.stringify(order.items));
+        VALUES (?,?,?,?,?)`).run(id, req.user.id, 'REJECTED', reason.trim(), JSON.stringify(snapshot));
       db.prepare('UPDATE cutting_orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
         .run(ORDER_STATUS.REJECTED, id);
     });
