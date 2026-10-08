@@ -1,6 +1,6 @@
 # ApparelFlow Cutting Gate
 
-A small full-stack ERP checkpoint for moving garment cutting batches to the sewing floor. It implements the challenge in the attached assessment brief: a batch can reach sewing only after an authorized verifier has counted every recipe component and found no shortage.
+A small full-stack ERP checkpoint for moving garment cutting batches to the sewing floor. A batch can reach sewing only after an authorized verifier has counted every recipe component and found no shortage.
 
 ## Run locally
 
