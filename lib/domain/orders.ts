@@ -237,57 +237,57 @@ async function loadDetail(q: Queryable, orderId: number, allowedStatuses?: reado
   const row = rows[0];
   if (!row) throw new DomainError('NOT_FOUND', 'Order not found.');
 
-  const [items, logs, events] = await Promise.all([
-    q.query<{
-      component_id: number;
-      component_name: string;
-      pieces_per_garment: number;
-      expected_qty: number;
-      actual_qty: number | null;
-      status: CountFlag;
-    }>(
-      `SELECT vi.component_id, rc.component_name, rc.pieces_per_garment, vi.expected_qty, vi.actual_qty, vi.status
-         FROM verification_items vi
-         JOIN recipe_components rc ON rc.id = vi.component_id
-        WHERE vi.order_id = $1
-        ORDER BY rc.sort_order, rc.id`,
-      [orderId],
-    ),
-    q.query<{
-      id: number;
-      decision: 'APPROVED' | 'REJECTED';
-      verifier_id: number;
-      verifier_name: string;
-      rejection_note: string | null;
-      wastage_pct: number;
-      items: VerificationLog['items'];
-      created_at: Date;
-    }>(
-      `SELECT l.id, l.decision, l.verifier_id, u.full_name AS verifier_name, l.rejection_note,
-              l.wastage_pct, l.items, l.created_at
-         FROM verification_logs l JOIN users u ON u.id = l.verifier_id
-        WHERE l.order_id = $1
-        ORDER BY l.created_at DESC, l.id DESC`,
-      [orderId],
-    ),
-    q.query<{
-      id: number;
-      event_type: string;
-      actor_name: string;
-      actor_role: Role;
-      from_status: OrderStatus | null;
-      to_status: OrderStatus;
-      note: string | null;
-      created_at: Date;
-    }>(
-      `SELECT e.id, e.event_type, u.full_name AS actor_name, u.role AS actor_role,
-              e.from_status, e.to_status, e.note, e.created_at
-         FROM order_events e JOIN users u ON u.id = e.actor_id
-        WHERE e.order_id = $1
-        ORDER BY e.created_at, e.id`,
-      [orderId],
-    ),
-  ]);
+  // One query at a time: inside a transaction these share a single connection,
+  // and Postgres connections do not run queries in parallel.
+  const items = await q.query<{
+    component_id: number;
+    component_name: string;
+    pieces_per_garment: number;
+    expected_qty: number;
+    actual_qty: number | null;
+    status: CountFlag;
+  }>(
+    `SELECT vi.component_id, rc.component_name, rc.pieces_per_garment, vi.expected_qty, vi.actual_qty, vi.status
+       FROM verification_items vi
+       JOIN recipe_components rc ON rc.id = vi.component_id
+      WHERE vi.order_id = $1
+      ORDER BY rc.sort_order, rc.id`,
+    [orderId],
+  );
+  const logs = await q.query<{
+    id: number;
+    decision: 'APPROVED' | 'REJECTED';
+    verifier_id: number;
+    verifier_name: string;
+    rejection_note: string | null;
+    wastage_pct: number;
+    items: VerificationLog['items'];
+    created_at: Date;
+  }>(
+    `SELECT l.id, l.decision, l.verifier_id, u.full_name AS verifier_name, l.rejection_note,
+            l.wastage_pct, l.items, l.created_at
+       FROM verification_logs l JOIN users u ON u.id = l.verifier_id
+      WHERE l.order_id = $1
+      ORDER BY l.created_at DESC, l.id DESC`,
+    [orderId],
+  );
+  const events = await q.query<{
+    id: number;
+    event_type: string;
+    actor_name: string;
+    actor_role: Role;
+    from_status: OrderStatus | null;
+    to_status: OrderStatus;
+    note: string | null;
+    created_at: Date;
+  }>(
+    `SELECT e.id, e.event_type, u.full_name AS actor_name, u.role AS actor_role,
+            e.from_status, e.to_status, e.note, e.created_at
+       FROM order_events e JOIN users u ON u.id = e.actor_id
+      WHERE e.order_id = $1
+      ORDER BY e.created_at, e.id`,
+    [orderId],
+  );
 
   const wastage = row.actual_fabric_yds == null ? null : wastagePct(row.actual_fabric_yds, row.std_fabric_yards, row.target_qty);
 
