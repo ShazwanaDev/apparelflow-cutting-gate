@@ -19,7 +19,7 @@ export function SegmentedTabs({
 }) {
   const reduce = useReducedMotion();
   return (
-    <nav aria-label={label} className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+    <nav aria-label={label} className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
       <ul className="inline-flex min-w-max gap-1 rounded-full border border-line bg-surface p-1">
         {tabs.map(tab => (
           <li key={tab.href}>

@@ -16,7 +16,7 @@ export function OrderList({ orders, hrefFor, emphasiseWaiting = false }: { order
         <li key={order.id}>
           <Link
             href={hrefFor(order)}
-            className={`group grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 rounded-[12px] border bg-surface px-4 py-3.5 transition-colors duration-150 hover:border-ink sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto] sm:px-5 ${
+            className={`group grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 rounded-[12px] border bg-surface px-4 py-3.5 transition-colors duration-150 hover:border-ink sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_12.5rem_1.25rem] sm:px-5 ${
               order.status === 'REJECTED' ? 'border-shortage-line' : 'border-line'
             }`}
           >

@@ -53,7 +53,7 @@ export default async function SewingBatchPage({ params }: { params: Promise<{ id
           </Panel>
         </div>
 
-        <aside aria-labelledby="signoff-heading" className="flex flex-col gap-4">
+        <aside aria-label="Sign-off and actions" className="order-first flex flex-col gap-4 lg:order-none">
           <Panel className="bg-match-tint p-5" aria-labelledby="signoff-heading">
             <h2 id="signoff-heading" className="flex items-center gap-2 font-display text-3xl text-ink">
               <BadgeCheck aria-hidden className="size-6 text-match" /> Signed off

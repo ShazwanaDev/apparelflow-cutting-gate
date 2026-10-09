@@ -53,7 +53,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
         </a>
       )}
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <SegmentedTabs
           id="orders"
           label="Filter orders by status"

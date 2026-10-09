@@ -31,10 +31,10 @@ export default async function VerifyOrderPage({ params }: { params: Promise<{ id
       </Link>
 
       <StageHeader stage="Verification" title={pending ? 'Verification' : order.orderNo}>
-        <div className="text-right">
+        <div className="md:text-right">
           <p className="tabular font-mono text-2xl font-semibold text-ink">{order.orderNo}</p>
           <p className="text-sm text-muted">
-            {order.recipeName} · {formatCount(order.targetQty)} garments · {pending ? `waiting ${timeAgo(order.submittedAt)}` : ''}
+            {order.recipeName} · {formatCount(order.targetQty)} garments{pending ? ` · waiting ${timeAgo(order.submittedAt)}` : ''}
           </p>
           <StatusBadge status={order.status} className="mt-2" />
         </div>

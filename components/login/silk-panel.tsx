@@ -3,10 +3,10 @@
 import { useEffect, useRef } from 'react';
 
 const RIBBONS = [
-  { color: 'rgba(242, 145, 145, 0.85)', amp: 0.16, freq: 1.3, speed: 0.11, offset: 0.0, y: 0.34, width: 0.2 },
-  { color: 'rgba(247, 173, 173, 0.75)', amp: 0.13, freq: 1.7, speed: 0.08, offset: 1.7, y: 0.48, width: 0.16 },
-  { color: 'rgba(177, 229, 230, 0.8)', amp: 0.18, freq: 1.1, speed: 0.07, offset: 3.1, y: 0.6, width: 0.18 },
-  { color: 'rgba(204, 251, 250, 0.85)', amp: 0.12, freq: 2.0, speed: 0.1, offset: 4.6, y: 0.72, width: 0.12 },
+  { color: 'rgba(242, 145, 145, 0.62)', amp: 0.16, freq: 1.3, speed: 0.11, offset: 0.0, y: 0.34, width: 0.2 },
+  { color: 'rgba(247, 173, 173, 0.5)', amp: 0.13, freq: 1.7, speed: 0.08, offset: 1.7, y: 0.48, width: 0.16 },
+  { color: 'rgba(177, 229, 230, 0.55)', amp: 0.18, freq: 1.1, speed: 0.07, offset: 3.1, y: 0.6, width: 0.18 },
+  { color: 'rgba(204, 251, 250, 0.6)', amp: 0.12, freq: 2.0, speed: 0.1, offset: 4.6, y: 0.72, width: 0.12 },
 ];
 
 /**

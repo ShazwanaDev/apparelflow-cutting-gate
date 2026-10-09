@@ -14,7 +14,7 @@ export default async function LoginPage() {
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-      <aside className="relative hidden overflow-hidden bg-ink lg:block" aria-label="About the cutting gate">
+      <aside className="relative hidden overflow-hidden bg-ink lg:sticky lg:top-0 lg:block lg:h-dvh" aria-label="About the cutting gate">
         <SilkPanel />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
           <span className="label-caps text-white">Cutting · Verification · Sewing</span>
