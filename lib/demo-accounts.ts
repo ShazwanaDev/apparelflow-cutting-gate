@@ -28,3 +28,11 @@ export const DEMO_ACCOUNTS: Array<{ email: string; password: string; role: Role;
     summary: 'Receives verified batches only and starts sewing assembly.',
   },
 ];
+
+/**
+ * Whether the demo role switcher and credential cards are shown. On by default
+ * because the assessment asks for them; set NEXT_PUBLIC_DEMO_MODE=false for
+ * any deployment with real users. Hiding the UI is not the whole job there:
+ * the demo users themselves should not be seeded either.
+ */
+export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE !== 'false';
