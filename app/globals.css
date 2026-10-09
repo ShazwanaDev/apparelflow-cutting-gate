@@ -1,0 +1,174 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Contrast ratios were measured against the background each
+ * token is used on (WCAG 2.2 relative luminance):
+ *   ink on canvas 17.4:1, muted on canvas 7.1:1, ink on coral 8.0:1,
+ *   shortage on its tint 6.1:1, excess 5.2:1, match 5.4:1,
+ *   input border on white 3.9:1 (non-text minimum is 3:1).
+ * The brand pastels are fills only. Coral as text on white is 2.3:1, so pastel
+ * text on a light background is never used anywhere.
+ */
+@theme {
+  --color-ink: #1a1416;
+  --color-muted: #5c5356;
+  --color-placeholder: #6e6467;
+  --color-canvas: #fff9f8;
+  --color-surface: #ffffff;
+  --color-sunken: #faf3f2;
+  --color-line: #e7dcdc;
+  --color-line-strong: #8a7f82;
+  --color-disabled: #f3eeee;
+
+  --color-coral: #f29191;
+  --color-blush: #f7adad;
+  --color-blush-tint: #fdeded;
+  --color-aqua: #b1e5e6;
+  --color-mint: #ccfbfa;
+
+  --color-shortage: #b42318;
+  --color-shortage-tint: #fef3f2;
+  --color-shortage-line: #fda29b;
+  --color-excess: #b54708;
+  --color-excess-tint: #fffaeb;
+  --color-excess-line: #fedf89;
+  --color-match: #067647;
+  --color-match-tint: #ecfdf3;
+  --color-match-line: #75e0a7;
+  --color-info: #0e7490;
+  --color-info-tint: #ecfdff;
+
+  --font-display: var(--font-instrument-serif), 'Times New Roman', serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-raised: 0 1px 2px rgb(26 20 22 / 0.06), 0 1px 1px rgb(26 20 22 / 0.04);
+  --shadow-floating: 0 12px 32px -8px rgb(26 20 22 / 0.18), 0 2px 6px rgb(26 20 22 / 0.08);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* This build ships one carefully checked light theme. Declaring it stops a dark
+   operating system from repainting form controls and autofill in dark colours,
+   which is how white-on-white input text usually happens. */
+:root {
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  background-color: var(--color-canvas);
+  /* Very faint woven grain: two hairline grids at a slight angle, like the
+     warp and weft of a fabric seen up close. */
+  background-image:
+    repeating-linear-gradient(88deg, rgb(26 20 22 / 0.018) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-2deg, rgb(26 20 22 / 0.014) 0 1px, transparent 1px 9px);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every text control gets explicit colours in every state, so no browser,
+   extension or OS theme can leave the text invisible. */
+input,
+select,
+textarea {
+  color: var(--color-ink);
+  background-color: var(--color-surface);
+  font: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-placeholder);
+  opacity: 1;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: var(--color-muted);
+  background-color: var(--color-disabled);
+  -webkit-text-fill-color: var(--color-muted);
+  opacity: 1;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-ink);
+  caret-color: var(--color-ink);
+  box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  transition: background-color 9999s ease-out;
+}
+
+select option {
+  color: var(--color-ink);
+  background-color: var(--color-surface);
+}
+
+/* A 2px ink ring with a canvas-coloured gap reads clearly on every surface in
+   the app, including the coral and mint fills. */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Uppercase micro-label, the small tracked caps used above values and sections. */
+@utility label-caps {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@utility field-control {
+  width: 100%;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line-strong);
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  padding: 0.5rem 0.75rem;
+  transition: border-color 150ms, box-shadow 150ms;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-ink);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 1px;
+    border-color: var(--color-ink);
+  }
+  &[aria-invalid='true'] {
+    border-color: var(--color-shortage);
+    box-shadow: 0 0 0 1px var(--color-shortage);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

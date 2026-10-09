@@ -1,17 +1,8 @@
 import bcrypt from 'bcryptjs';
 import type { Database } from '@/lib/server/db';
 import type { Role } from '@/lib/domain/constants';
+import { DEMO_ACCOUNTS } from '@/lib/demo-accounts';
 import { approveOrder, createOrder, rejectOrder, saveCounts, startSewing, submitOrder, type Actor } from '@/lib/domain/orders';
-
-/**
- * Public demo accounts, one per role. They exist so an evaluator can sign in as
- * each persona; they must never be reused for a real deployment.
- */
-export const DEMO_USERS: Array<{ email: string; password: string; role: Role; fullName: string }> = [
-  { email: 'supervisor@apparelflow.demo', password: 'Supervisor123!', role: 'cutting_supervisor', fullName: 'Maya Perera' },
-  { email: 'verifier@apparelflow.demo', password: 'Verifier123!', role: 'cutting_verifier', fullName: 'Nilan Fernando' },
-  { email: 'sewing@apparelflow.demo', password: 'Sewing123!', role: 'sewing_supervisor', fullName: 'Asha Silva' },
-];
 
 const RECIPES = [
   {
@@ -58,7 +49,7 @@ export async function seed(db: Database, options: { sampleOrders?: boolean; bcry
   if ((existing.rows[0]?.count ?? 0) > 0) return { seeded: false };
 
   const actors = {} as Record<Role, Actor>;
-  for (const user of DEMO_USERS) {
+  for (const user of DEMO_ACCOUNTS) {
     const hash = await bcrypt.hash(user.password, bcryptRounds);
     const { rows } = await db.query<{ id: number }>(
       'INSERT INTO users (email, password_hash, role, full_name) VALUES ($1, $2, $3, $4) RETURNING id',
