@@ -1,16 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'motion/react';
-import type { Role } from '@/lib/domain/constants';
-
-export const STAGES = ['Cutting', 'Verification', 'Sewing'] as const;
-export type Stage = (typeof STAGES)[number];
-
-export const STAGE_BY_ROLE: Record<Role, Stage> = {
-  cutting_supervisor: 'Cutting',
-  cutting_verifier: 'Verification',
-  sewing_supervisor: 'Sewing',
-};
+import { STAGES, type Stage } from '@/lib/stages';
 
 /**
  * CUTTING · VERIFICATION · SEWING. Shows where the signed-in role sits in the
@@ -52,7 +43,6 @@ export function PipelineStepper({ active }: { active: Stage }) {
  * below it, so the page always says which part of the handoff you are in.
  */
 export function StageHeader({ stage, title, children }: { stage: Stage; title?: string; children?: React.ReactNode }) {
-  const reduce = useReducedMotion();
   const index = STAGES.indexOf(stage);
   const before = STAGES[index - 1];
   const after = STAGES[index + 1];
@@ -60,35 +50,33 @@ export function StageHeader({ stage, title, children }: { stage: Stage; title?: 
   return (
     <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
-        <div aria-hidden className="h-6 overflow-hidden sm:h-8">
+        <div aria-hidden className="h-7 sm:h-9">
           {before && (
             <motion.p
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease }}
-              className="font-display text-2xl leading-none text-ink/15 select-none sm:text-4xl"
-              style={{ transform: 'translateY(35%)' }}
+              className="font-display text-2xl leading-none text-ink/20 select-none sm:text-3xl"
             >
               {before}
             </motion.p>
           )}
         </div>
         <motion.h1
-          initial={reduce ? false : { opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease }}
           className="font-display text-5xl leading-[0.95] tracking-tight text-ink sm:text-7xl"
         >
           {title ?? stage}
         </motion.h1>
-        <div aria-hidden className="h-6 overflow-hidden sm:h-8">
+        <div aria-hidden className="h-7 pt-1.5 sm:h-9">
           {after && (
             <motion.p
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.05, ease }}
-              className="font-display text-2xl leading-none text-ink/15 select-none sm:text-4xl"
-              style={{ transform: 'translateY(-10%)' }}
+              className="font-display text-2xl leading-none text-ink/20 select-none sm:text-3xl"
             >
               {after}
             </motion.p>

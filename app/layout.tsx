@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { MotionProvider } from '@/components/motion-provider';
 import './globals.css';
 
 const sans = Geist({ subsets: ['latin'], variable: '--font-geist-sans', display: 'swap' });
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable} ${display.variable}`}>
       <body>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Toaster
           position="bottom-right"
           closeButton
