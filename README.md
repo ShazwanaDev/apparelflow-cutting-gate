@@ -5,7 +5,8 @@ Cut bundles are counted against their recipe before anything reaches the sewing
 floor. A batch with a single short component cannot be approved, and the sewing
 floor never sees a batch that has not been signed off.
 
-- **Live URL:** not deployed yet (see [Deployment](#deployment))
+- **Live URL:** https://apparelflow-cutting-gate-nine.vercel.app
+- **Repository:** https://github.com/ShazwanaDev/apparelflow-cutting-gate
 - **Stack:** Next.js 16 (App Router) · TypeScript · PostgreSQL · Tailwind CSS 4 · Vitest
 
 ## Demo accounts
@@ -128,6 +129,7 @@ there for the person at the screen.
 | Approve or reject an order that is not pending; start sewing twice | `409` |
 | Sewing supervisor opening an unverified order by ID | `404` |
 | Mutating request from another origin | `403` |
+| Direct access through the database host's REST API (Supabase Data API) | refused: row-level security is on for every table and the API roles have no privileges |
 | Malformed JSON / wrong content type / body over 32 KB | `400` / `415` / `413` |
 
 The verifier's identity always comes from the signed session, and every
@@ -221,6 +223,7 @@ fresh. To use any other Postgres instead, point `DATABASE_URL` at it.
 | `DATABASE_URL` | Postgres connection string. Add `?sslmode=require` for hosted databases. |
 | `SESSION_SECRET` | Signs session cookies. At least 32 characters. |
 | `DATABASE_POOL_MAX` | Optional pool size (default 5). Use 1 with the local PGlite server. |
+| `DATABASE_CA_CERT` / `DATABASE_CA_CERT_PATH` | Root certificate for databases signed by their own authority (Supabase), as PEM text or a file path. TLS is always verified. |
 | `NEXT_PUBLIC_DEMO_MODE` | `false` hides the demo role switcher and credential cards. |
 
 ## Tests
@@ -274,12 +277,27 @@ input guards, and direct SQL attempts to edit the audit trail.
 
 ## Deployment
 
-The app is ready to deploy to Vercel with a managed Postgres (Neon or Supabase):
+The live app runs on **Vercel** (functions pinned to Singapore, `sin1`) with a
+**Supabase** Postgres in the same region. To deploy a copy:
 
-1. Create the database and copy its connection string (with `sslmode=require`).
-2. Set `DATABASE_URL`, `SESSION_SECRET` and `NEXT_PUBLIC_DEMO_MODE` in the project's environment variables.
-3. From a machine with that `DATABASE_URL`, run `npm run db:setup` once to create the schema and seed data.
-4. Deploy. The build command is `npm run build`.
+1. Create a Supabase project and copy the **Session pooler** connection string
+   (Connect → Session pooler), adding `?sslmode=require`. Vercel cannot reach the
+   direct connection.
+2. Download the project's root certificate (Database Settings → SSL Configuration).
+   Supabase signs with its own authority, so the certificate is needed to keep
+   verification on.
+3. Put the connection string in a git-ignored `.env.production.local`, with
+   `DATABASE_CA_CERT_PATH=./supabase-ca.crt`, and create the schema and seed data:
+   ```powershell
+   $env:ENV_FILE = ".env.production.local"; npm run db:setup
+   ```
+4. In the Vercel project, set `DATABASE_URL`, `DATABASE_CA_CERT` (the PEM text),
+   `SESSION_SECRET`, `DATABASE_POOL_MAX=2` and `NEXT_PUBLIC_DEMO_MODE`, then deploy
+   with `npx vercel deploy --prod`.
+
+Migrations are plain SQL files in [db/migrations](db/migrations), applied in order
+and recorded in `schema_migrations`; re-running `db:setup` is safe. The second
+migration closes the Supabase REST API (see [Security contract](#security-contract)).
 
 ## Design notes
 
