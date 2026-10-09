@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { Pool, types } from 'pg';
 
 /**
@@ -62,21 +63,44 @@ export function setDatabaseForTests(db: Database | undefined) {
   globalForDb.apparelflowDbOverride = db;
 }
 
+/**
+ * Opens a connection pool from DATABASE_URL.
+ *
+ * Hosted databases need TLS, and the certificate is always verified. Some
+ * providers, Supabase among them, sign with their own certificate authority
+ * rather than a public one, so its root certificate can be supplied either as
+ * PEM text in DATABASE_CA_CERT (for a host like Vercel) or as a file path in
+ * DATABASE_CA_CERT_PATH (for running scripts locally).
+ *
+ * The sslmode parameter is taken out of the URL and turned into explicit
+ * settings, because node-postgres lets the URL's sslmode override the ssl
+ * option, which would silently drop the custom certificate.
+ */
+export function createPool(max = Number(process.env.DATABASE_POOL_MAX ?? 5)): Pool {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) throw new Error('DATABASE_URL is not set');
+  const url = new URL(raw);
+  const sslmode = url.searchParams.get('sslmode');
+  url.searchParams.delete('sslmode');
+
+  let ca = process.env.DATABASE_CA_CERT?.replace(/\\n/g, '\n');
+  if (!ca && process.env.DATABASE_CA_CERT_PATH) ca = readFileSync(process.env.DATABASE_CA_CERT_PATH, 'utf8');
+  const useTls = Boolean(ca) || (sslmode !== null && sslmode !== 'disable');
+
+  const pool = new Pool({
+    connectionString: url.toString(),
+    max,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 10_000,
+    ssl: useTls ? { rejectUnauthorized: true, ...(ca ? { ca } : {}) } : undefined,
+  });
+  pool.on('error', error => console.error('Postgres pool error', error.message));
+  return pool;
+}
+
 export function getDb(): Database {
   if (globalForDb.apparelflowDbOverride) return globalForDb.apparelflowDbOverride;
-  if (!globalForDb.apparelflowDb) {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) throw new Error('DATABASE_URL is not set');
-    const pool = new Pool({
-      connectionString,
-      max: Number(process.env.DATABASE_POOL_MAX ?? 5),
-      idleTimeoutMillis: 10_000,
-      // Hosted Postgres (Neon, Supabase) requires TLS; the local dev server does not.
-      ssl: /sslmode=require/.test(connectionString) ? { rejectUnauthorized: true } : undefined,
-    });
-    pool.on('error', error => console.error('Postgres pool error', error.message));
-    // Cached on globalThis so hot reloads in development do not open a new pool each time.
-    globalForDb.apparelflowDb = fromPool(pool);
-  }
+  // Cached on globalThis so hot reloads in development do not open a new pool each time.
+  globalForDb.apparelflowDb ??= fromPool(createPool());
   return globalForDb.apparelflowDb;
 }

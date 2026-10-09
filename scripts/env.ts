@@ -1,6 +1,11 @@
-/** Loads .env.local, then .env, the same files Next.js reads, for the CLI scripts. */
+/**
+ * Loads env files for the CLI scripts, in the same order of precedence Next.js
+ * uses. Set ENV_FILE to load a specific file first, e.g. ENV_FILE=.env.production.local
+ * to run migrations against the production database.
+ */
 export function loadEnv() {
-  for (const file of ['.env.local', '.env']) {
+  const files = [process.env.ENV_FILE, '.env.local', '.env'].filter((file): file is string => Boolean(file));
+  for (const file of files) {
     try {
       process.loadEnvFile(file);
     } catch {
